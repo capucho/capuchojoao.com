@@ -136,7 +136,5 @@ I will write a next post on how to provide a nice interface when handling asynch
 
 Have a nice week, stay safe. Use a mask!
 
-#### Credits
-"JavaScript Logo" by b0neskull is licensed under CC BY-NC-SA 2.0. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/2.0/
 
 
