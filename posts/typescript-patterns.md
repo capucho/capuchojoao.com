@@ -15,22 +15,21 @@ I've found this one when I read [Programming TypeScript](https://www.amazon.com/
 
 It amazed me by how simple and useful this can be. This is how the module is presented:
 
-```typescript
-
+```ts
 // Currency.ts
 
 // Here we will create a type and a variable
 // with the same name
 type Currency = {
-    unit: "EUR" | "GBP" | "JPY" | "USD";
-    value: number;
+  unit: 'EUR' | 'GBP' | 'JPY' | 'USD';
+  value: number;
 };
 
 let Currency = {
-    DEFAULT: "USD",
-    from(value: number, unit = Currency.DEFAULT): Currency {
-        return { unit, value };
-    }
+  DEFAULT: 'USD',
+  from(value: number, unit = Currency.DEFAULT): Currency {
+    return { unit, value };
+  },
 };
 
 export { Currency };
@@ -41,16 +40,16 @@ And this is how the module is consumed:
 ```typescript
 // index.ts
 
-import { Currency } from "./Currency";
+import { Currency } from './Currency';
 
 // Use case 1: Used as type
 let amountDue: Currency = {
-  unit: "JPY",
-  value: 83733.1
+  unit: 'JPY',
+  value: 83733.1,
 };
 
 // use case 2: Used as factory object
-let otherAmountDue = Currency.from(330, "EUR");
+let otherAmountDue = Currency.from(330, 'EUR');
 
 console.log({ amountDue, otherAmountDue });
 ```
@@ -67,35 +66,35 @@ _(If you want to understand a bit more on the compiler options, [this link](http
 
 However, whenever we developers like an idea, we ~~smash the code until it works~~ find a proper path to make it reasonable. In this particular case, it is possible to use this with the strict option, by doing a small tweak. Our module will look like the following:
 
-``` typescript
-type ValidCurrencies =  "EUR" | "GBP" | "JPY" | "USD";
+```typescript
+type ValidCurrencies = 'EUR' | 'GBP' | 'JPY' | 'USD';
 
 // "Small tweak": Type that will be used on
 // the variable that is used as constructor
 type NotExposedCurrency = {
-  from: (value: number, unit: ValidCurrencies) => Currency
-  DEFAULT: ValidCurrencies
-}
+  from: (value: number, unit: ValidCurrencies) => Currency;
+  DEFAULT: ValidCurrencies;
+};
 
 // Here we have the things we would like to export
 
 type Currency = {
-  unit: ValidCurrencies
+  unit: ValidCurrencies;
   value: number;
 };
 
 // Type Constructor
 // Here is where we use the tweak
 let Currency: NotExposedCurrency = {
-  DEFAULT: "USD",
+  DEFAULT: 'USD',
   from(value: number, unit = Currency.DEFAULT): Currency {
     return { unit, value };
-  }
+  },
 };
 
-export { Currency }
-
+export { Currency };
 ```
+
 By typing the factory with a private type, the variable won't have an `implicit any` type. This won't impact our usage since we have no interest in the Factory type. Our interest is at the factory function return type.
 
 Applying this change, the `index.ts` export was still the same and it enabled the feature usage even when the compiler is set to a strict mode.
@@ -127,6 +126,7 @@ public class ThisOneThrows {
 }
 
 ```
+
 Java compiler will enforce you to declare that the `main` function throws as well or that you need to wrap the call `ThisOneThrows.hereWeThrow()` in a `try...catch` block.
 
 ```java
@@ -158,7 +158,7 @@ public class ThisOneThrows {
 
 Knowing this behavior upfront is always resourceful when dealing with error handling, and I've always missed that in TS. It's a really impressive type system, especially considering the environment it runs at, but not being able to know the possible errors I could expect bugged me for a while.
 
-However, the Go community has been dealing with this for a while. In Go, you don't have a _throws_ declaration, the solution? __Return an actual error object to the function consumer__.
+However, the Go community has been dealing with this for a while. In Go, you don't have a _throws_ declaration, the solution? **Return an actual error object to the function consumer**.
 
 So, why not doing that in TS as well? _(This is a controversial pattern for many, but from my perspective, as long as it increases the chances of catching an issue before the client does, it brings value to the table)_.
 
@@ -175,13 +175,12 @@ class DateIsInTheFutureError extends Error {}
 
 // Type guard for the errors
 function isError(input: unknown): input is Error {
-    return input instanceof Error
+  return input instanceof Error;
 }
 
 // a helper functions for dates.
 function isValid(date: Date) {
-    return Object.prototype.toString.call(date) === '[object Date]'
-        && !Number.isNaN(date.getTime())
+  return Object.prototype.toString.call(date) === '[object Date]' && !Number.isNaN(date.getTime());
 }
 ```
 
@@ -189,46 +188,35 @@ This is how we could define our logic to handle the errors:
 
 ```typescript
 // birthday.ts
-import {
-  InvalidDateFormatError,
-  DateIsInTheFutureError,
-  isError,
-  isValid
-} from './helpers'
+import { InvalidDateFormatError, DateIsInTheFutureError, isError, isValid } from './helpers';
 
-function parse(
-  birthday: string
-): Date | InvalidDateFormatError | DateIsInTheFutureError {
-  let date = new Date(birthday)
+function parse(birthday: string): Date | InvalidDateFormatError | DateIsInTheFutureError {
+  let date = new Date(birthday);
 
   if (!isValid(date)) {
-    return new InvalidDateFormatError(
-      'Enter a date in the form YYYY/MM/DD'
-    )
+    return new InvalidDateFormatError('Enter a date in the form YYYY/MM/DD');
   }
 
   if (date.getTime() > Date.now()) {
-    return new DateIsInTheFutureError('A what?')
+    return new DateIsInTheFutureError('A what?');
   }
 
-  return date
+  return date;
 }
 
 function getYear(birthday: string = new Date().toISOString()): number {
-  const possibleDate  = parse(birthday) // step 1
+  const possibleDate = parse(birthday); // step 1
 
-  if(isError(possibleDate)) {
-      // step 2
-      console.log(possibleDate.message)
-      return
+  if (isError(possibleDate)) {
+    // step 2
+    console.log(possibleDate.message);
+    return;
   }
 
-  A
+  A;
   // step 3
-  return possibleDate.getFullYear()
-
+  return possibleDate.getFullYear();
 }
-
 ```
 
 Let's start with the `step 1` part, inside the `getYear` function. Here we call the `parse` function. This function, as the signature states, tries to parse a string into a Date. The signature also shows that besides the Date we want, 2 errors could be returned from the validation conditions.
@@ -267,31 +255,28 @@ With this pattern, you can derive types that will improve your IntelliSense and 
 // redis.d.ts
 
 type Events = {
-  ready: void
-  error: Error
-  reconnecting: {attempt: number, delay: number}
-}
+  ready: void;
+  error: Error;
+  reconnecting: { attempt: number; delay: number };
+};
 
 type RedisClient = {
   // subscriber function
-  on<E extends keyof Events>(
-     event: E,
-     f: (arg: Events[E]) => void
-  ): void
-}
+  on<E extends keyof Events>(event: E, f: (arg: Events[E]) => void): void;
+};
 ```
 
 And this is how this would be used:
 
 ```typescript
 // redis.ts
-import Redis from 'redis'
+import Redis from 'redis';
 
 // Create a new instance of a Redis client
-let client: RedisClient = redis.createClient()
+let client: RedisClient = redis.createClient();
 
 // Listen for a few events emitted by the client
-client.on('ready', () => console.info('Client is ready'))
+client.on('ready', () => console.info('Client is ready'));
 ```
 
 If we take a look at our subscriber function in`redis.d.ts`, TypeScript will realize that the event can only be one of the types `'read' | 'error' | 'reconnecting'`, since the values are keys from the Event type. It will also add types and dynamically validate the function arguments since it will be based on the event type you select.
@@ -307,8 +292,9 @@ Feel free to comment and bring your ideas to this article.
 ![Bye](https://media.giphy.com/media/9eM1SWnqjrc40/giphy.gif)
 
 ## References and Resources
--  [TypeScript Docs](https://www.typescriptlang.org/docs/handbook/generics.html)
--  [Programming TypeScript](https://www.amazon.com/Programming-TypeScript-Making-JavaScript-Applications/dp/1492037656)
+
+- [TypeScript Docs](https://www.typescriptlang.org/docs/handbook/generics.html)
+- [Programming TypeScript](https://www.amazon.com/Programming-TypeScript-Making-JavaScript-Applications/dp/1492037656)
 - [FrontendMasters - TypeScript](https://frontendmasters.com/courses/typescript-v2/); Some material related to this one is presented for free in [here](https://github.com/mike-works/typescript-fundamentals)
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
 - [Udemy - Understanding TypeScript](https://www.udemy.com/course/understanding-typescript/)
@@ -316,4 +302,3 @@ Feel free to comment and bring your ideas to this article.
 ## Appreciation
 
 - Martin Fieber, that helped me a lot with my TypeScript learnings and had a lot (I mean, a LOT) of patience with me.
-

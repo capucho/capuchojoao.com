@@ -8,26 +8,14 @@ import utilStyles from '../styles/utils.module.css';
 
 import { getSortedPostsData } from '../lib/posts';
 
-const ELEMENTS_TO_DISPLAY = 3
-export default function Home({ allPostsData }) {
+export default function Posts({ allPostsData }) {
   return (
-    <Layout home>
+    <Layout>
       <Head>
         <title>{siteTitle}</title>
       </Head>
-      <section className={utilStyles.headingMd}>
-        <p>Brazilian, Software Engineer (Node.js, AWS) based in Stockholm, Sweden.</p>
-        <p>
-          I write about tech and books. But I also like to make pizza, try new vegan recipes, read &amp; DIY. If my cat allows :)
-        </p>
-      </section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Latest Posts &nbsp;- &nbsp;
-        <Link href="/posts">
-          <a>See all</a>
-        </Link>
-      </h2>
-
+        <h2 className={utilStyles.headingLg}>All Posts</h2>
         <ul className={utilStyles.list}>
           {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
@@ -51,7 +39,7 @@ export async function getStaticProps() {
   const allPostsData = getSortedPostsData();
   return {
     props: {
-      allPostsData: allPostsData.slice(0, ELEMENTS_TO_DISPLAY),
+      allPostsData,
     },
   };
 }
