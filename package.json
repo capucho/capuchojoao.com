@@ -1,12 +1,12 @@
 {
-  "name": "Personal Website",
+  "name": "personal-website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build && next export",
     "start": "next start",
-    "deploy:production": "aws s3 sync out/ s3://capuchojoao.com"
+    "deploy:production": "aws s3 sync out/ s3://joaocapucho.com --content-type 'text/html'"
   },
   "dependencies": {
     "date-fns": "^2.14.0",
